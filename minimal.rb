@@ -10,7 +10,6 @@ inject_into_file "Gemfile", before: "group :development, :test do" do
     gem "simple_form", github: "heartcombo/simple_form"
     gem "sassc-rails"
     gem "cssbundling-rails"
-
   RUBY
 end
 
@@ -28,7 +27,6 @@ run "mv app/assets/rails-stylesheets-master app/assets/stylesheets"
 
 # Layout
 ########################################
-
 gsub_file(
   "app/views/layouts/application.html.erb",
   '<meta name="viewport" content="width=device-width,initial-scale=1">',
@@ -67,18 +65,14 @@ environment general_config
 # After bundle
 ########################################
 after_bundle do
-  # Generators: db + simple form + pages controller
-  ########################################
   rails_command "db:drop db:create db:migrate"
   generate("simple_form:install", "--bootstrap")
   generate(:controller, "pages", "home", "--skip-routes", "--no-test-framework")
 
   # Routes
-  ########################################
   route 'root to: "pages#home"'
 
   # Gitignore
-  ########################################
   append_file ".gitignore", <<~TXT
 
     # Ignore .env file containing credentials.
@@ -89,40 +83,16 @@ after_bundle do
     .DS_Store
   TXT
 
-  # Bootstrap & Popper
-  ########################################
-  append_file "config/importmap.rb", <<~RUBY
-    pin "bootstrap", to: "bootstrap.min.js", preload: true
-    pin "@popperjs/core", to: "popper.js", preload: true
-  RUBY
-
-  append_file "config/initializers/assets.rb", <<~RUBY
-    Rails.application.config.assets.precompile += %w(bootstrap.min.js popper.js)
-  RUBY
-
-  append_file "app/javascript/application.js", <<~JS
-    import "@popperjs/core"
-    import "bootstrap"
-  JS
-
-  append_file "app/assets/config/manifest.js", <<~JS
-    //= link popper.js
-    //= link bootstrap.min.js
-  JS
-
   # Heroku
   run "bundle lock --add-platform x86_64-linux"
 
   # Dotenv
-  ########################################
   run "touch '.env'"
 
   # Rubocop
-  ########################################
   run "curl -L https://raw.githubusercontent.com/lewagon/rails-templates/master/.rubocop.yml > .rubocop.yml"
 
   # Git
-  ########################################
   git :init
   git add: "."
   git commit: "-m 'Initial commit with minimal template from https://github.com/lewagon/rails-templates'"
