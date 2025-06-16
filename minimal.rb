@@ -9,6 +9,7 @@ inject_into_file "Gemfile", before: "group :development, :test do" do
     gem "font-awesome-sass", "~> 6.1"
     gem "simple_form", github: "heartcombo/simple_form"
     gem "sassc-rails"
+    gem "cssbundling-rails"
 
   RUBY
 end
